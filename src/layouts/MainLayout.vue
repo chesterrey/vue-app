@@ -32,9 +32,9 @@ const toggle = (event) => {
 </script>
 <template>
     <main class="relative">
-        <header class="shadow-md py-4 px-8 flex justify-between items-center">
+        <header class="shadow-md py-4 px-8 flex justify-between items-center border-b">
             <h1 class="text-lg font-bold">Training App</h1>
-            <Avatar label="P" class="mr-2" size="large" shape="circle" @click="toggle" />
+            <Avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" @click="toggle" />
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
         </header>
         <slot></slot>
