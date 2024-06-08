@@ -8,9 +8,11 @@ import Menu from 'primevue/menu';
 
 const router = useRouter();
 
+const route = router.currentRoute.value;
+
 const menu = ref();
 const items = ref([
-    {   
+    {
         label: 'Profile',
         items: [
             {
@@ -33,17 +35,17 @@ const toggle = (event) => {
         <header class="shadow-md py-4 px-8 flex justify-between items-center">
             <h1 class="text-lg font-bold">Training App</h1>
             <Avatar label="P" class="mr-2" size="large" shape="circle" @click="toggle" />
-            <Menu ref="menu" id="overlay_menu" :model="items" :popup="true"  />
+            <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
         </header>
         <slot></slot>
         <nav class="fixed bottom-0 grid grid-cols-3 w-full min-h-20 border-t">
-            <router-link to="/" class="p-4 text-center">
+            <router-link to="/home" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'home'}">
                 <i class="pi pi-flag"></i><br><span>Current</span>
             </router-link>
-            <router-link to="/" class="p-4 text-center">
+            <router-link to="/blocks" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'blocks'}">
                 <i class="pi pi-folder-open"></i><br><span>Blocks</span>
             </router-link>
-            <router-link to="/" class="p-4 text-center">
+            <router-link to="/progress" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'progress'}">
                 <i class="pi pi-chart-line"></i><br><span>Progress</span>
             </router-link>
         </nav>
