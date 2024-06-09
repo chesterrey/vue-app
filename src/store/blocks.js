@@ -14,17 +14,42 @@ export default function useBlockStore() {
     return response;
   };
 
-  const addTrainingCycle = async (trainingCycle) => {
-    const response = await BlockService.addTrainingCycle(trainingCycle);
+  const addTrainingCycle = async (form) => {
+    const response = await BlockService.addTrainingCycle(form);
     if (response.success) {
       state.trainingCycles.push(response.data);
     }
     return response;
-  }
+  };
+
+  const deleteTrainingCycle = async (id) => {
+    const response = await BlockService.deleteTrainingCycle(id);
+    if (response.success) {
+      state.trainingCycles = state.trainingCycles.filter(
+        (cycle) => cycle.id !== id
+      );
+    }
+    return response;
+  };
+
+  const editTrainingCycle = async (form) => {
+    const response = await BlockService.editTrainingCycle(form);
+    if (response.success) {
+      state.trainingCycles = state.trainingCycles.map((cycle) => {
+        if (cycle.id === form.id) {
+          return response.data;
+        }
+        return cycle;
+      });
+    }
+    return response;
+  };
 
   return {
     ...toRefs(state),
     getTrainingCycles,
     addTrainingCycle,
+    deleteTrainingCycle,
+    editTrainingCycle,
   };
 }

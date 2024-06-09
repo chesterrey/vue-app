@@ -38,7 +38,7 @@ const toggle = (event) => {
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
         </header>
         <slot></slot>
-        <nav class="fixed bottom-0 grid grid-cols-3 w-full min-h-20 border-t">
+        <nav class="fixed bottom-0 grid grid-cols-3 w-full min-h-20 border-t bg-white">
             <router-link to="/home" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'home'}">
                 <i class="pi pi-flag"></i><br><span>Current</span>
             </router-link>

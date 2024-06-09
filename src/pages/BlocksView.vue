@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import useAuthStore from "../store/auth.js";
 
 import MainLayout from '../layouts/MainLayout.vue';
-import CreateCycleDialog from '../components/CreateCycleDialog.vue';
+import CycleDialog from '../components/CycleDialog.vue';
 
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
@@ -12,7 +12,7 @@ import Button from 'primevue/button';
 
 import useBlockStore from '../store/blocks.js';
 
-const { trainingCycles, getTrainingCycles, addTrainingCycle } = useBlockStore();
+const { trainingCycles, getTrainingCycles } = useBlockStore();
 
 onMounted(() => {
     getTrainingCycles();
@@ -24,10 +24,19 @@ onMounted(() => {
         <div class="min-h-[1200px]">
             <div class="p-8 my-4 border-y flex justify-between items-center">
                 <h1 class="font-bold text-xl">Training Blocks</h1>
-                <CreateCycleDialog />
+                <CycleDialog />
             </div>
             <Accordion :activeIndex="0">
-                <AccordionTab :header="cycle.name" v-for="cycle in trainingCycles" :key="cycle.id">
+                <AccordionTab v-for="cycle in trainingCycles" :key="cycle.id">
+                    <template #header>
+                        <div class="flex justify-between items-center w-full">
+                            <h2 class="font-semibold text-lg">{{ cycle.name }}</h2>
+                            <div class="flex items-center gap-2">
+                                <CycleDialog :method="'edit'" :trainingCycle="cycle" />
+                                <CycleDialog :method="'delete'" :trainingCycle="cycle" />
+                            </div>
+                        </div>
+                    </template>
                     <p class="m-0">
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
                         labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
