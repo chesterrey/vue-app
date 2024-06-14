@@ -90,6 +90,29 @@ class BlockService {
       };
     }
   }
+
+  async addTrainingBlock(form) {
+    try {
+      const response = await fetch(`${API_URL}/training-blocks`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+        body: JSON.stringify(form),
+      }).then((response) => {
+        return response.json();
+      });
+      return response;
+    } catch (e) {
+      return {
+        message: e.response.data.message,
+        code: e.response.status,
+        success: false,
+        data: null,
+      };
+    }
+  }
 }
 
 export default new BlockService();

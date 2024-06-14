@@ -42,7 +42,7 @@ const toggle = (event) => {
             <router-link to="/home" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'home'}">
                 <i class="pi pi-flag"></i><br><span>Current</span>
             </router-link>
-            <router-link to="/blocks" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'blocks'}">
+            <router-link to="/blocks" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'blocks' || route.name === 'block-detail'}">
                 <i class="pi pi-folder-open"></i><br><span>Blocks</span>
             </router-link>
             <router-link to="/progress" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'progress'}">

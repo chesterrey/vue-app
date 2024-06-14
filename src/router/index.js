@@ -5,6 +5,7 @@ import AuthView from "../pages/AuthView.vue";
 import HomeView from "../pages/HomeView.vue";
 import BlocksView from "../pages/BlocksView.vue";
 import ProgressView from "../pages/ProgressView.vue";
+import BlockDetailView from "../pages/BlockDetailView.vue";
 
 const routes = [
   { path: "/", redirect: "/auth" },
@@ -22,6 +23,12 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/blocks/:id",
+    name: "block-detail",
+    component: BlockDetailView,
+    meta: { requiresAuth: true },
+  },
+  {
     path: "/progress",
     name: "progress",
     component: ProgressView,
@@ -30,7 +37,7 @@ const routes = [
   {
     path: "/:pathMatch(.*)*",
     redirect: "/auth",
-  }
+  },
 ];
 
 const router = createRouter({

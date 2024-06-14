@@ -1,0 +1,146 @@
+<script setup>
+import { ref, defineProps, watch, onMounted } from 'vue';
+
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import Stepper from 'primevue/stepper';
+import StepperPanel from 'primevue/stepperpanel';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import Dropdown from 'primevue/dropdown';
+import Checkbox from 'primevue/checkbox';
+import { useToast } from 'primevue/usetoast';
+import Toast from 'primevue/toast';
+
+import useBlockStore from '../store/blocks'
+
+
+const props = defineProps({
+    trainingCycle: Object
+});
+
+const toast = useToast();
+
+const visible = ref(false);
+const weeks = ref(4);
+const days = ref(4);
+const trainingDays = ref([]);
+const selectedTrainingDay = ref(null);
+
+watch(days, (newDays) => {
+    trainingDays.value = Array.from({ length: newDays }, (_, i) => (
+        {
+            day: i + 1,
+            exercises: [],
+        }
+    ));
+});
+
+const handleDialog = (e) => {
+    e.stopPropagation();
+    visible.value = true;
+};
+
+const handleAddExercise = (e) => {
+    const trainingDay = trainingDays.value.find((day) => day.day === selectedTrainingDay.value.day);
+    trainingDay.exercises.push({
+        name: '',
+        strength: false,
+    });
+}
+
+const removeExercise = (e) => {
+    const trainingDay = trainingDays.value.find((day) => day.day === selectedTrainingDay.value.day);
+    trainingDay.exercises.splice(trainingDay.exercises.indexOf(e), 1);
+}
+
+const handleCreateTrainingBlock = () => {
+    const form = {
+        training_cycle_id: props.trainingCycle.id,
+        weeks: weeks.value,
+        training_days: trainingDays.value,
+    };
+
+    useBlockStore().addTrainingBlock(form).then((res) => {
+        toast.add({ severity: 'success', summary: 'Success Message', detail: "Training Block added successfully", life: 3000 });
+        console.log(res);
+    });
+}
+
+
+onMounted(() => {
+    trainingDays.value = Array.from({ length: days.value }, (_, i) => (
+        {
+            day: i + 1,
+            exercises: []
+        }
+    ));
+})
+
+</script>
+<template>
+    <Toast />
+    <Button icon="pi pi-plus" outlined @click="handleDialog" />
+    <Dialog v-model:visible="visible" modal header="Add Training Block" :style="{ width: '25rem' }">
+        <Stepper linear>
+            <StepperPanel>
+                <template #content="{ nextCallback }">
+                    <div class="flex flex-col">
+                        <div class="flex flex-col gap-2 mb-4">
+                            <label class="font-bold" for="weeks">Weeks</label>
+                            <InputNumber id="weeks" v-model="weeks" mode="decimal" :min=1 class="w-2" />
+                        </div>
+                        <div class="flex flex-col gap-2 mb-4">
+                            <label class="font-bold" for="days">Days</label>
+                            <InputNumber id="days" v-model="days" mode="decimal" :min=1 class="w-2" />
+                        </div>
+                    </div>
+                    <div class="flex pt-4 justify-end">
+                        <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="nextCallback" />
+                    </div>
+                </template>
+            </StepperPanel>
+            <StepperPanel>
+                <template #content="{ prevCallback, nextCallback }">
+                    <div class="flex flex-col gap-4">
+                        <Dropdown v-model="selectedTrainingDay" :options="trainingDays" :optionLabel="(day) => 'Day ' + day.day"
+                            placeholder="Select a Day" class="w-full" />
+                            <div v-if="selectedTrainingDay" class="p-4">
+                                <div class="flex flex-col gap-6">
+                                    <div v-for="(exercise, index) in selectedTrainingDay.exercises">
+                                        <div class="grid grid-cols-2">
+                                            <label :for="index">Exercise {{ index + 1 }}</label>
+                                            <div class="flex items-center gap-2 place-content-end">
+                                                <label :for="index">Strength</label>
+                                                <Checkbox v-model="exercise.strength" :binary="true" class="mr-2" />
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-2">
+                                            <InputText :id="index" class="w-full" v-model="exercise.name" />
+                                            <Button icon="pi pi-trash" @click="removeExercise" />
+                                        </div>
+                                    </div>
+                                    <Button label="Add" @click="handleAddExercise" />
+                                </div>
+
+                            </div>
+                    </div>
+                    <div class="flex pt-4 justify-between">
+                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />
+                        <Button label="Next" icon="pi pi-arrow-right" iconPos="right" @click="nextCallback" />
+                    </div>
+                </template>
+            </StepperPanel>
+            <StepperPanel>
+                <template #content="{ prevCallback }">
+                    <div class="flex flex-col">
+                        <Button @click="handleCreateTrainingBlock" label="Create training block"></Button>
+                    </div>
+                    <div class="flex pt-4 justify-start">
+                        <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />
+                    </div>
+                </template>
+            </StepperPanel>
+        </Stepper>
+    </Dialog>
+</template>

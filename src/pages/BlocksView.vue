@@ -1,18 +1,24 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from 'vue-router';
-import useAuthStore from "../store/auth.js";
 
 import MainLayout from '../layouts/MainLayout.vue';
 import CycleDialog from '../components/CycleDialog.vue';
+import CreateBlockDialog from "../components/CreateBlockDialog.vue";
 
 import Accordion from 'primevue/accordion';
 import AccordionTab from 'primevue/accordiontab';
-import Button from 'primevue/button';
 
 import useBlockStore from '../store/blocks.js';
 
 const { trainingCycles, getTrainingCycles } = useBlockStore();
+
+const router = useRouter();
+
+const handleBlockClick = (e, id) => {
+    e.stopPropagation();
+    router.push({ name: 'block-detail', params: { id: id } });
+};
 
 onMounted(() => {
     getTrainingCycles();
@@ -32,19 +38,16 @@ onMounted(() => {
                         <div class="flex justify-between items-center w-full">
                             <h2 class="font-semibold text-lg">{{ cycle.name }}</h2>
                             <div class="flex items-center gap-2">
+                                <CreateBlockDialog :trainingCycle="cycle" />
                                 <CycleDialog :method="'edit'" :trainingCycle="cycle" />
                                 <CycleDialog :method="'delete'" :trainingCycle="cycle" />
                             </div>
                         </div>
                     </template>
-                    <p class="m-0">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco
-                        laboris nisi ut aliquip ex ea commodo
-                        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-                        fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                        deserunt mollit anim id est
-                        laborum.
+                    <p class="m-0 flex flex-col gap-2">
+                        <div v-for="block in cycle.training_blocks" class="p-8 bg-primary" @click="handleBlockClick($event, block.id)">
+                            <h2 class="font-bold text-lg text-center text-white">Block {{ block.order }}</h2>
+                        </div>
                     </p>
                 </AccordionTab>
             </Accordion>

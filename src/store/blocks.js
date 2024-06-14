@@ -45,11 +45,25 @@ export default function useBlockStore() {
     return response;
   };
 
+  const addTrainingBlock = async (form) => {
+    const response = await BlockService.addTrainingBlock(form);
+    if (response.success) {
+      state.trainingCycles = state.trainingCycles.map((cycle) => {
+        if (cycle.id === form.trainingCycleId) {
+          cycle.trainingBlocks.push(response.data);
+        }
+        return cycle;
+      });
+    }
+    return response;
+  };
+
   return {
     ...toRefs(state),
     getTrainingCycles,
     addTrainingCycle,
     deleteTrainingCycle,
     editTrainingCycle,
+    addTrainingBlock,
   };
 }

@@ -5,6 +5,7 @@ import useBlockStore from '../store/blocks.js'
 import Button from 'primevue/button';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
 import { useToast } from 'primevue/usetoast';
 import Toast from 'primevue/toast';
 
@@ -65,9 +66,9 @@ onMounted(() => {
 <template>
     <Toast />
     <div class="card flex justify-center">
-        <Button icon="pi pi-pencil" outlined v-if="method === 'edit'" @click="handleDialog" />
+        <Button icon="pi pi-pencil" outlined severity="warning" v-if="method === 'edit'" @click="handleDialog" />
         <Button icon="pi pi-trash" outlined severity="danger" v-if="method === 'delete'" @click="handleDialog" />
-        <Button icon="pi pi-plus" v-if="!method" @click="handleDialog" />
+        <Button label="New" v-if="!method" @click="handleDialog" />
         <Dialog v-model:visible="visible" modal header="New Training Cycle" :style="{ width: '25rem' }" v-if="!method">
             <div class="my-4">
                 <label for="name" class="font-semibold">Training Cycle Name</label>
@@ -96,9 +97,8 @@ onMounted(() => {
             </div>
             <div class="flex justify-end gap-2">
                 <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
-                <Button type="button" label="Delete" severity="danger" @click="handleDelete"></Button>  
+                <Button type="button" label="Delete" severity="danger" @click="handleDelete"></Button>
             </div>
         </Dialog>
     </div>
 </template>
-
