@@ -51,7 +51,6 @@ router.beforeEach((to, from, next) => {
   authStore.validateSession();
 
   const isAuthenticated = authStore.isAuthenticated;
-
   if (to.meta.requiresAuth && !isAuthenticated.value) {
     next({ name: "auth" });
   } else if (to.name === "auth" && isAuthenticated.value) {

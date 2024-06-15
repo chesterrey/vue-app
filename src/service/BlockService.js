@@ -113,6 +113,50 @@ class BlockService {
       };
     }
   }
+
+  async getTrainingBlock(id) {
+    try {
+      const response = await fetch(`${API_URL}/training-blocks/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }).then((response) => {
+        return response.json();
+      });
+      return response;
+    } catch (e) {
+      return {
+        message: e.response.data.message,
+        code: e.response.status,
+        success: false,
+        data: null,
+      };
+    }
+  }
+
+  async getTrainingBlocks(id) {
+    try {
+      const response = await fetch(`${API_URL}/training-blocks/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }).then((response) => {
+        return response.json();
+      });
+      return response;
+    } catch (e) {
+      return {
+        message: e.response.data.message,
+        code: e.response.status,
+        success: false,
+        data: null,
+      };
+    }
+  }
 }
 
 export default new BlockService();
