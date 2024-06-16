@@ -4,8 +4,18 @@ import ExerciseService from "../service/ExerciseService";
 const state = reactive({});
 
 export default function useExerciseStore() {
+  const addExercise = async (form) => {
+    const response = await ExerciseService.addExercise(form);
+    return response;
+  };
+
   const editExercise = async (form) => {
     const response = await ExerciseService.editExercise(form);
+    return response;
+  };
+
+  const deleteExercise = async (id) => {
+    const response = await ExerciseService.deleteExercise(id);
     return response;
   };
 
@@ -19,10 +29,18 @@ export default function useExerciseStore() {
     return response;
   };
 
+  const updateExerciseSet = async (form) => {
+    const response = await ExerciseService.updateExerciseSet(form);
+    return response;
+  };
+
   return {
     ...toRefs(state),
+    addExercise,
     editExercise,
+    deleteExercise,
     addExerciseSet,
     deleteExerciseSet,
+    updateExerciseSet,
   };
 }

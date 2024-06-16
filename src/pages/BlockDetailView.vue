@@ -22,9 +22,8 @@ const day = ref(1);
 const trainingSession = ref(null);
 const selectedExercise = ref(null);
 
-const mycheckbox = ref(1);
-
 const editDialog = ref(false);
+const deleteDialog = ref(false);
 
 const exerciseMenu = ref();
 const exerciseMenuToggle = (event, exerciseId, index) => {
@@ -36,11 +35,23 @@ const setMenuToggle = (event, index) => {
     setMenu.value[index].toggle(event);
 };
 
+const sessionDone = () => {
+    return trainingSession.value.exercises.every((exercise) => isDone(exercise));
+}
+
 const isDone = (exercise) => {
-    return exercise.sets.every((set) => set.logged);
+    return exercise.sets.every((set) => set.logged) && exercise.sets.length > 0;
 }
 
 const saveEditedExercise = () => {
+    if (!selectedExercise.value.id) {
+        useExerciseStore().addExercise(selectedExercise.value).then((res) => {
+            trainingSession.value.exercises.push(res.data);
+            editDialog.value = false;
+        });
+        return;
+    }
+
     useExerciseStore().editExercise(selectedExercise.value).then((res) => {
         const index = trainingSession.value.exercises.findIndex(e => e.id === selectedExercise.value.id);
         trainingSession.value.exercises[index] = res.data;
@@ -73,6 +84,28 @@ const handleRemoveSet = (exerciseId, setId, index) => {
 
     useExerciseStore().deleteExerciseSet(setId).then(() => {
         exercise.sets.splice(setIndex, 1);
+    });
+}
+
+const handleLogSet = (exerciseId, setId) => {
+    const exercise = trainingSession.value.exercises.find(e => e.id === exerciseId);
+    const set = exercise.sets.find(s => s.id === setId);
+
+    if (set.logged && set.load && set.reps) {
+        useExerciseStore().updateExerciseSet(set).then(() => {
+            set.logged = true;
+        });
+    } else {
+        set.logged = false;
+    }
+
+}
+
+const handleDeleteExercise = () => {
+    useExerciseStore().deleteExercise(selectedExercise.value.id).then(() => {
+        const index = trainingSession.value.exercises.findIndex(e => e.id === selectedExercise.value.id);
+        trainingSession.value.exercises.splice(index, 1);
+        deleteDialog.value = false;
     });
 }
 
@@ -153,12 +186,24 @@ onMounted(() => {
                         <div class="flex flex-col gap-6 w-[220px]">
                             <h3 class="text-xl font-bold">Exercise menu</h3>
                             <div class="flex flex-col gap-4">
-                                <Button label="Add Exercise" icon="pi pi-plus" />
+                                <Button label="Add Exercise" icon="pi pi-plus" @click="() => {
+                                    editDialog = true;
+                                    selectedExercise = {
+                                        week_id: trainingSession.id,
+                                        name: '',
+                                        strength: false,
+                                        rpe: 6,
+                                        muscle_group: '',
+                                    };
+                                }" />
                                 <Button label="Edit Exercise" icon="pi pi-pencil" @click="() => {
                                     editDialog = true;
-                                    selectedExercise = {...exercise};
+                                    selectedExercise = { ...exercise };
                                 }" />
-                                <Button label="Delete Exercise" icon="pi pi-trash" />
+                                <Button label="Delete Exercise" icon="pi pi-trash" @click="() => {
+                                    deleteDialog = true;
+                                    selectedExercise = { ...exercise };
+                                }" />
                                 <Button label="Add Set" icon="pi pi-plus-circle"
                                     @click="handleAddSet(exercise.id, index)" />
                             </div>
@@ -181,21 +226,21 @@ onMounted(() => {
                             <Button text label="Remove set" @click="handleRemoveSet(exercise.id, set.id)"></Button>
                         </OverlayPanel>
                         <div class="col-span-3">
-                            <input v-model="set.load" type="number"
+                            <input v-model="set.load" type="number" :disabled="set.logged"
                                 class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2">
                         </div>
                         <div class="col-span-3">
-                            <input v-model="set.reps" type="number"
+                            <input v-model="set.reps" type="number" :disabled="set.logged"
                                 class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2">
                         </div>
                         <div class="col-span-2">
-                            <Checkbox v-model="set.logged" :binary="true" />
+                            <Checkbox v-model="set.logged" :binary="true" @change="handleLogSet(exercise.id, set.id)" />
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <Dialog v-model:visible="editDialog" modal header="Edit Exercise" :style="{ width: '20rem' }">
+        <Dialog v-model:visible="editDialog" modal header="Exercise Form" :style="{ width: '20rem' }">
             <div class="flex flex-col gap-2 py-6">
                 <div class="grid grid-cols-2">
                     <div class="flex items-center gap-2 place-content-start">
@@ -209,6 +254,15 @@ onMounted(() => {
             <div class="flex justify-end gap-2">
                 <Button type="button" label="Cancel" severity="secondary" @click="editDialog = false"></Button>
                 <Button type="button" label="Save" @click="saveEditedExercise"></Button>
+            </div>
+        </Dialog>
+        <Dialog v-model:visible="deleteDialog" modal header="Delete exercise" :style="{ width: '20rem' }">
+            <div class="flex flex-col gap-2 py-6">
+                <p>Are you sure you want to delete this exercise?</p>
+            </div>
+            <div class="flex justify-end gap-2">
+                <Button type="button" label="Cancel" severity="secondary" @click="deleteDialog = false"></Button>
+                <Button type="button" label="Delete" @click="handleDeleteExercise"></Button>
             </div>
         </Dialog>
     </MainLayout>
