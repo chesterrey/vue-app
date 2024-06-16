@@ -2,12 +2,15 @@
 import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import useBlockStore from "../store/blocks.js";
+import useExerciseStore from "../store/exercises.js";
 import MainLayout from '../layouts/MainLayout.vue';
 
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
 import Checkbox from 'primevue/checkbox';
 import Chip from 'primevue/chip';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
 
 const router = useRouter();
 
@@ -17,16 +20,33 @@ const week = ref(1);
 const day = ref(1);
 
 const trainingSession = ref(null);
+const selectedExercise = ref(null);
+
+const mycheckbox = ref(1);
+
+const editDialog = ref(false);
 
 const exerciseMenu = ref();
-const exerciseMenuToggle = (event, exerciseId) => {
-    exerciseMenu.value.toggle(event);
+const exerciseMenuToggle = (event, exerciseId, index) => {
+    exerciseMenu.value[index].toggle(event);
 };
 
 const setMenu = ref();
-const setMenuToggle = (event, setId) => {
-    setMenu.value.toggle(event);
+const setMenuToggle = (event, index) => {
+    setMenu.value[index].toggle(event);
 };
+
+const isDone = (exercise) => {
+    return exercise.sets.every((set) => set.logged);
+}
+
+const saveEditedExercise = () => {
+    useExerciseStore().editExercise(selectedExercise.value).then((res) => {
+        const index = trainingSession.value.exercises.findIndex(e => e.id === selectedExercise.value.id);
+        trainingSession.value.exercises[index] = res.data;
+        editDialog.value = false;
+    });
+}
 
 const toggleOverlay = (event) => {
     op.value.toggle(event);
@@ -37,6 +57,23 @@ const handleCalendarClick = (wk, d) => {
     week.value = wk;
     day.value = d;
     op.value.hide();
+}
+
+const handleAddSet = (exerciseId, index) => {
+    const exercise = trainingSession.value.exercises.find(e => e.id === exerciseId);
+    useExerciseStore().addExerciseSet(exerciseId).then((response) => {
+        exercise.sets.push(response.data);
+    });
+    exerciseMenu.value[index].hide();
+}
+
+const handleRemoveSet = (exerciseId, setId, index) => {
+    const exercise = trainingSession.value.exercises.find(e => e.id === exerciseId);
+    const setIndex = exercise.sets.findIndex(s => s.id === setId);
+
+    useExerciseStore().deleteExerciseSet(setId).then(() => {
+        exercise.sets.splice(setIndex, 1);
+    });
 }
 
 watch([week, day], () => {
@@ -60,21 +97,28 @@ onMounted(() => {
         <div class="min-h-[1200px] pb-96 flex flex-col gap-4" v-if="trainingBlock">
             <div class="p-6 flex flex-col border shadow-md">
                 <div class="flex justify-between items-center">
-                    <div>
+                    <div class="flex flex-col gap-1">
                         <h3 class="font-bold text-lg">{{ trainingBlock.training_cycle.name }} <span
                                 class="text-primary">Block {{ trainingBlock.order }}</span>
                         </h3>
-                        <div class="text-lg">
-                            Week <span class="font-bold">{{ week }}</span>
-                            Day <span class="font-bold">{{ day }}</span>
+                        <div class="flex items-center gap-4">
+                            <div class="text-lg">
+                                Week <span class="font-bold">{{ week }}</span>
+                                Day <span class="font-bold">{{ day }}</span>
+                            </div>
+                            <i v-if="trainingSession.done" class="pi pi-check-circle text-primary text-2xl"></i>
+                            <i v-else class="pi pi-spinner text-gray-800 text-2xl"></i>
                         </div>
                     </div>
-                    <Button icon="pi pi-calendar" outlined @click="toggleOverlay" />
+                    <div class="flex items-center gap-4">
+                        <Button icon="pi pi-calendar" outlined @click="toggleOverlay" />
+                    </div>
                     <OverlayPanel ref="op" appendTo="self">
                         <div class="flex flex-col gap-6 w-[250px]">
                             <h3 class="text-xl font-bold">Block Calendar</h3>
                             <div class="w-full grid gap-4">
-                                <div class="w-full grid place-items-center" v-bind:class="`grid-cols-${trainingBlock.weeks}`">
+                                <div class="w-full grid place-items-center"
+                                    v-bind:class="`grid-cols-${trainingBlock.weeks}`">
                                     <div v-for="week in trainingBlock.weeks" :key="week">
                                         Wk {{ week }}
                                     </div>
@@ -90,32 +134,38 @@ onMounted(() => {
                             </div>
                         </div>
                     </OverlayPanel>
+                </div>
+            </div>
+            <div class="p-6 flex flex-col items-start border gap-2 shadow-md"
+                v-for="(exercise, index) in trainingSession.exercises">
+                <div class="flex justify-between items-center w-full">
+                    <Chip class="pl-0 pr-3">
+                        <span class="text-primary-inverse rounded-full w-8 h-8 flex items-center justify-center"
+                            :class="isDone(exercise) ? 'bg-primary' : 'bg-gray-500'">
+                            <i v-if="isDone(exercise)" class="pi pi-check-circle"></i>
+                            <i v-else class="pi pi-circle"></i>
+                        </span>
+                        <span class="ml-2 font-medium">{{ exercise.muscle_group }}</span>
+                    </Chip>
+                    <Button icon="pi pi-ellipsis-v" text rounded
+                        @click="exerciseMenuToggle($event, exercise.id, index)" />
                     <OverlayPanel ref="exerciseMenu" appendTo="self">
-                        <div class="flex flex-col gap-6 w-[250px]">
+                        <div class="flex flex-col gap-6 w-[220px]">
                             <h3 class="text-xl font-bold">Exercise menu</h3>
                             <div class="flex flex-col gap-4">
                                 <Button label="Add Exercise" icon="pi pi-plus" />
-                                <Button label="Edit Exercise" icon="pi pi-pencil" />
+                                <Button label="Edit Exercise" icon="pi pi-pencil" @click="() => {
+                                    editDialog = true;
+                                    selectedExercise = {...exercise};
+                                }" />
                                 <Button label="Delete Exercise" icon="pi pi-trash" />
-                                <Button label="Add Set" icon="pi pi-plus-circle" />
+                                <Button label="Add Set" icon="pi pi-plus-circle"
+                                    @click="handleAddSet(exercise.id, index)" />
                             </div>
                         </div>
                     </OverlayPanel>
-                    <OverlayPanel ref="setMenu" appendTo="self">
-                        <div class="flex flex-col gap-6 w-[250px]">
-                            <h3 class="text-xl font-bold">Set menu</h3>
-                            <Button label="Delete Set" icon="pi pi-trash" />
-                        </div>
-                    </OverlayPanel>
                 </div>
-            </div>
-            <div class="p-6 flex flex-col items-start border gap-4 shadow-md"
-                v-for="exercise in trainingSession.exercises">
-                <div class="flex justify-between items-center w-full">
-                    <div>muscle</div>
-                    <Button icon="pi pi-ellipsis-v" text rounded @click="exerciseMenuToggle($event, exercise.id)" />
-                </div>
-                <div class="font-semibold text-lg">{{ exercise.name }}</div>
+                <div class="font-semibold text-xl">{{ exercise.name }}</div>
                 <Chip :label="exercise.strength ? 'Strength' : 'Accessory'" class="rounded-none" />
                 <div class="flex flex-col gap-3 w-full">
                     <div class="grid grid-cols-9 place-items-center font-bold">
@@ -124,15 +174,19 @@ onMounted(() => {
                         <div class="col-span-3">Reps</div>
                         <div class="col-span-2">Log</div>
                     </div>
-                    <div v-for="set in exercise.sets" class="grid grid-cols-9 place-items-center">
-                        <Button icon="pi pi-ellipsis-v" text rounded class="col-span-1" @click="setMenuToggle($event, set.id)"/>
+                    <div v-for="(set, setIndex) in exercise.sets" class="grid grid-cols-9 place-items-center">
+                        <Button icon="pi pi-ellipsis-v" text rounded class="col-span-1"
+                            @click="setMenuToggle($event, setIndex)" />
+                        <OverlayPanel ref="setMenu" appendTo="self">
+                            <Button text label="Remove set" @click="handleRemoveSet(exercise.id, set.id)"></Button>
+                        </OverlayPanel>
                         <div class="col-span-3">
                             <input v-model="set.load" type="number"
-                                class="w-[70px] text-center focus:outline-primary p-2 rounded-none border-2">
+                                class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2">
                         </div>
                         <div class="col-span-3">
                             <input v-model="set.reps" type="number"
-                                class="w-[70px] text-center focus:outline-primary p-2 rounded-none border-2">
+                                class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2">
                         </div>
                         <div class="col-span-2">
                             <Checkbox v-model="set.logged" :binary="true" />
@@ -141,5 +195,21 @@ onMounted(() => {
                 </div>
             </div>
         </div>
+        <Dialog v-model:visible="editDialog" modal header="Edit Exercise" :style="{ width: '20rem' }">
+            <div class="flex flex-col gap-2 py-6">
+                <div class="grid grid-cols-2">
+                    <div class="flex items-center gap-2 place-content-start">
+                        <label>Strength</label>
+                        <Checkbox v-model="selectedExercise.strength" :binary="true" />
+                    </div>
+                </div>
+                <InputText class="w-full mt-2" placeholder="Exercise Name" v-model="selectedExercise.name" />
+                <InputText class="w-full" placeholder="Muscle Group" v-model="selectedExercise.muscle_group" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <Button type="button" label="Cancel" severity="secondary" @click="editDialog = false"></Button>
+                <Button type="button" label="Save" @click="saveEditedExercise"></Button>
+            </div>
+        </Dialog>
     </MainLayout>
 </template>

@@ -46,6 +46,7 @@ const handleAddExercise = (e) => {
     trainingDay.exercises.push({
         name: '',
         strength: false,
+        muscle_group: ''
     });
 }
 
@@ -103,27 +104,29 @@ onMounted(() => {
             <StepperPanel>
                 <template #content="{ prevCallback, nextCallback }">
                     <div class="flex flex-col gap-4">
-                        <Dropdown v-model="selectedTrainingDay" :options="trainingDays" :optionLabel="(day) => 'Day ' + day.day"
-                            placeholder="Select a Day" class="w-full" />
-                            <div v-if="selectedTrainingDay" class="p-4">
-                                <div class="flex flex-col gap-6">
-                                    <div v-for="(exercise, index) in selectedTrainingDay.exercises">
-                                        <div class="grid grid-cols-2">
-                                            <label :for="index">Exercise {{ index + 1 }}</label>
-                                            <div class="flex items-center gap-2 place-content-end">
-                                                <label :for="index">Strength</label>
-                                                <Checkbox v-model="exercise.strength" :binary="true" class="mr-2" />
-                                            </div>
-                                        </div>
-                                        <div class="flex items-center gap-2 mt-2">
-                                            <InputText :id="index" class="w-full" v-model="exercise.name" />
-                                            <Button icon="pi pi-trash" @click="removeExercise" />
+                        <Dropdown v-model="selectedTrainingDay" :options="trainingDays"
+                            :optionLabel="(day) => 'Day ' + day.day" placeholder="Select a Day" class="w-full" />
+                        <div v-if="selectedTrainingDay" class="p-4">
+                            <div class="flex flex-col gap-6">
+                                <div v-for="(exercise, index) in selectedTrainingDay.exercises">
+                                    <div class="grid grid-cols-2">
+                                        <label :for="index">Exercise {{ index + 1 }}</label>
+                                        <div class="flex items-center gap-2 place-content-end">
+                                            <label :for="index">Strength</label>
+                                            <Checkbox v-model="exercise.strength" :binary="true" class="mr-2" />
                                         </div>
                                     </div>
-                                    <Button label="Add" @click="handleAddExercise" />
+                                    <InputText :id="index" class="w-full mt-2" v-model="exercise.name" placeholder="Exercise Name"/>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <InputText :id="`muscle-${index}`" class="w-full" placeholder="Muscle Group"
+                                            v-model="exercise.muscle_group" />
+                                        <Button icon="pi pi-trash" @click="removeExercise" />
+                                    </div>
                                 </div>
-
+                                <Button label="Add" @click="handleAddExercise" />
                             </div>
+
+                        </div>
                     </div>
                     <div class="flex pt-4 justify-between">
                         <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />

@@ -3,7 +3,7 @@ import BlockService from "../service/BlockService";
 
 const state = reactive({
   trainingCycles: [],
-  trainingBlock: {}
+  trainingBlock: {},
 });
 
 export default function useBlockStore() {
@@ -62,7 +62,7 @@ export default function useBlockStore() {
   const getTrainingBlock = async (id) => {
     const response = await BlockService.getTrainingBlock(id);
     if (response.success) {
-        state.trainingBlock = response.data;
+      state.trainingBlock = response.data;
     }
     return response;
   };
@@ -74,6 +74,6 @@ export default function useBlockStore() {
     deleteTrainingCycle,
     editTrainingCycle,
     addTrainingBlock,
-    getTrainingBlock
+    getTrainingBlock,
   };
 }
