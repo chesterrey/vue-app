@@ -17,9 +17,7 @@ const handleLogout = () => {
 <template>
     <MainLayout>
         <div class="min-h-[1200px]">
-            <h1>Home</h1>
-            <p>Welcome, {{ user }}</p>
-            <Button outlined label="Logout" @click="handleLogout" />
+            Work in progress...
         </div>
     </MainLayout>
 </template>

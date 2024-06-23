@@ -2,6 +2,7 @@
 import { useRouter } from 'vue-router';
 import { ref } from "vue";
 import useAuthStore from "../store/auth.js";
+import useBlockStore from '../store/blocks';
 
 import Avatar from 'primevue/avatar';
 import Menu from 'primevue/menu';
@@ -19,6 +20,7 @@ const items = ref([
                 label: 'Logout',
                 command: () => {
                     useAuthStore().destroySession();
+                    useBlockStore().reset();
                     router.push({ name: 'auth' });
                 }
             },

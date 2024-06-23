@@ -92,6 +92,12 @@ export default function useBlockStore() {
     return response;
   };
 
+  const reset = () => {
+    state.trainingCycles = [];
+    state.trainingBlock = {};
+    state.activeTrainingBlock = {};
+  };
+
   return {
     ...toRefs(state),
     getTrainingCycles,
@@ -103,5 +109,6 @@ export default function useBlockStore() {
     updateTrainingWeek,
     getActiveTrainingBlock,
     setActiveTrainingBlock,
+    reset,
   };
 }
