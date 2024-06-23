@@ -4,6 +4,7 @@ import BlockService from "../service/BlockService";
 const state = reactive({
   trainingCycles: [],
   trainingBlock: {},
+  activeTrainingBlock: {}
 });
 
 export default function useBlockStore() {
@@ -67,6 +68,30 @@ export default function useBlockStore() {
     return response;
   };
 
+  const updateTrainingWeek = async (form) => {
+    const response = await BlockService.updateTrainingWeek(form);
+    if (response.success) {
+      state.trainingBlock = response.data;
+    }
+    return response;
+  };
+
+  const getActiveTrainingBlock = async () => {
+    const response = await BlockService.getActiveTrainingBlock();
+    if (response.success) {
+      state.activeTrainingBlock = response.data;
+    }
+    return response;
+  };
+
+  const setActiveTrainingBlock = async (form) => {
+    const response = await BlockService.setActiveTrainingBlock(form);
+    if (response.success) {
+      state.activeTrainingBlock = response.data;
+    }
+    return response;
+  };
+
   return {
     ...toRefs(state),
     getTrainingCycles,
@@ -75,5 +100,8 @@ export default function useBlockStore() {
     editTrainingCycle,
     addTrainingBlock,
     getTrainingBlock,
+    updateTrainingWeek,
+    getActiveTrainingBlock,
+    setActiveTrainingBlock,
   };
 }

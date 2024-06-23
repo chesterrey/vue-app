@@ -25,6 +25,8 @@ const selectedExercise = ref(null);
 const editDialog = ref(false);
 const deleteDialog = ref(false);
 
+const activeTrainingBlock = ref(null);
+
 const exerciseMenu = ref();
 const exerciseMenuToggle = (event, exerciseId, index) => {
     exerciseMenu.value[index].toggle(event);
@@ -109,6 +111,23 @@ const handleDeleteExercise = () => {
     });
 }
 
+const handleSessionDone = () => {
+    trainingSession.value.done = true;
+    useBlockStore().updateTrainingWeek(trainingSession.value).then((res) => {
+        trainingSession.value = res.data;
+    });
+}
+
+const handleSetActiveBlock = () => {
+    useBlockStore().setActiveTrainingBlock({
+        training_block_id: trainingBlock.value.id
+    }).then((res) => {
+        activeTrainingBlock.value = res.data;
+    });
+}
+
+
+
 watch([week, day], () => {
     trainingSession.value = trainingBlock.value.training_days
         .find((d) => d.day === day.value).weeks
@@ -116,11 +135,43 @@ watch([week, day], () => {
 });
 
 onMounted(() => {
+
+    const goToNextSession = (session) => {
+        if (!session.done) {
+
+            week.value = session.week_number;
+            day.value = session.day;
+            return;
+        }
+
+        var nextDay = session.day;
+        var nextWeek = session.week_number;
+
+        if (nextDay >= trainingBlock.value.training_days.length) {
+            nextDay = 1;
+            nextWeek++;
+        } else {
+            nextDay++;
+        }
+
+        trainingSession.value = trainingBlock.value.training_days
+            .find((d) => d.day === nextDay).weeks
+            .find((wk) => wk.week_number === nextWeek);
+
+        goToNextSession(trainingSession.value);
+    }
+
+    useBlockStore().getActiveTrainingBlock().then((response) => {
+        activeTrainingBlock.value = response.data;
+    });
+
     useBlockStore().getTrainingBlock(router.currentRoute.value.params.id).then((response) => {
         trainingBlock.value = response.data;
         trainingSession.value = trainingBlock.value.training_days
             .find((d) => d.day === day.value).weeks
             .find((wk) => wk.week_number === week.value);
+
+        goToNextSession(trainingSession.value);
     });
 });
 
@@ -128,7 +179,7 @@ onMounted(() => {
 <template>
     <MainLayout>
         <div class="min-h-[1200px] pb-96 flex flex-col gap-4" v-if="trainingBlock">
-            <div class="p-6 flex flex-col border shadow-md">
+            <div class="p-6 flex flex-col border shadow-md gap-4">
                 <div class="flex justify-between items-center">
                     <div class="flex flex-col gap-1">
                         <h3 class="font-bold text-lg">{{ trainingBlock.training_cycle.name }} <span
@@ -161,13 +212,15 @@ onMounted(() => {
                                     <div v-for="week in trainingDay.weeks"
                                         @click="handleCalendarClick(week.week_number, trainingDay.day)"
                                         class="w-10 h-8 text-lg font-bold text-white bg-primary flex justify-center items-center">
-                                        {{ trainingDay.day }}
+                                        D{{ trainingDay.day }}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </OverlayPanel>
                 </div>
+                <Button outlined label="Set as active block" class="m-auto"
+                    v-if="trainingBlock.id !== activeTrainingBlock.id" @click="handleSetActiveBlock" />
             </div>
             <div class="p-6 flex flex-col items-start border gap-2 shadow-md"
                 v-for="(exercise, index) in trainingSession.exercises">
@@ -180,7 +233,7 @@ onMounted(() => {
                         </span>
                         <span class="ml-2 font-medium">{{ exercise.muscle_group }}</span>
                     </Chip>
-                    <Button icon="pi pi-ellipsis-v" text rounded
+                    <Button icon="pi pi-ellipsis-v" text rounded :disabled="trainingSession.done"
                         @click="exerciseMenuToggle($event, exercise.id, index)" />
                     <OverlayPanel ref="exerciseMenu" appendTo="self">
                         <div class="flex flex-col gap-6 w-[220px]">
@@ -220,7 +273,7 @@ onMounted(() => {
                         <div class="col-span-2">Log</div>
                     </div>
                     <div v-for="(set, setIndex) in exercise.sets" class="grid grid-cols-9 place-items-center">
-                        <Button icon="pi pi-ellipsis-v" text rounded class="col-span-1"
+                        <Button icon="pi pi-ellipsis-v" text rounded class="col-span-1" :disabled="set.logged"
                             @click="setMenuToggle($event, setIndex)" />
                         <OverlayPanel ref="setMenu" appendTo="self">
                             <Button text label="Remove set" @click="handleRemoveSet(exercise.id, set.id)"></Button>
@@ -234,10 +287,14 @@ onMounted(() => {
                                 class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2">
                         </div>
                         <div class="col-span-2">
-                            <Checkbox v-model="set.logged" :binary="true" @change="handleLogSet(exercise.id, set.id)" />
+                            <Checkbox v-model="set.logged" :binary="true" @change="handleLogSet(exercise.id, set.id)"
+                                :disabled="!set.load || !set.reps || trainingSession.done" />
                         </div>
                     </div>
                 </div>
+            </div>
+            <div class="flex gap-4 justify-center w-full ">
+                <Button v-if="!trainingSession.done && sessionDone()" label="Session Done" @click="handleSessionDone" />
             </div>
         </div>
         <Dialog v-model:visible="editDialog" modal header="Exercise Form" :style="{ width: '20rem' }">

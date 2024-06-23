@@ -27,6 +27,9 @@ export default function useAuthStore() {
       state.isAuthenticated = true;
       state.user = response.data.user;
       state.accessToken = response.data.accessToken;
+
+      localStorage.setItem("user", state.user);
+      localStorage.setItem("accessToken", state.accessToken);
     }
     return response;
   };
