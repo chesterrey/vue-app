@@ -27,10 +27,6 @@ const registerForm = ref({
     password_confirmation: null
 });
 
-loginForm.value = {
-    email: 'johndoe@email.com',
-    password: 'password123',
-};
 
 const toast = useToast();
 const showSuccess = (message) => {
