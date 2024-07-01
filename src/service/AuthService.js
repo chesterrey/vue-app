@@ -1,4 +1,6 @@
 const API_URL = `https://api.strength-training.xyz/api/auth`;
+console.log(API_URL);
+console.log(`${import.meta.env.VITE_API_BASE_URL}/api`);
 
 class AuthService {
   async login(form) {
