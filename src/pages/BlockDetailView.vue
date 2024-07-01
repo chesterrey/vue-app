@@ -3,7 +3,9 @@ import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router';
 import useBlockStore from "../store/blocks.js";
 import useExerciseStore from "../store/exercises.js";
+import { useConfirm } from "primevue/useconfirm";
 import MainLayout from '../layouts/MainLayout.vue';
+
 
 import Button from 'primevue/button';
 import OverlayPanel from 'primevue/overlaypanel';
@@ -11,8 +13,10 @@ import Checkbox from 'primevue/checkbox';
 import Chip from 'primevue/chip';
 import Dialog from 'primevue/dialog';
 import InputText from 'primevue/inputtext';
+import ConfirmPopup from 'primevue/confirmpopup';
 
 const router = useRouter();
+const confirm = useConfirm();
 
 const trainingBlock = ref(null);
 const op = ref();
@@ -125,6 +129,26 @@ const handleSetActiveBlock = () => {
         activeTrainingBlock.value = res.data;
     });
 }
+
+const confirmRemoveSet = (event, exerciseId, setId) => {
+    confirm.require({
+        target: event.currentTarget,
+        message: 'Are you sure you want to remove this set?',
+        icon: 'pi pi-exclamation-triangle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Save'
+        },
+        accept: () => {
+            handleRemoveSet(exerciseId, setId);
+        },
+        reject: () => {}
+    });
+};
 
 
 
@@ -273,11 +297,9 @@ onMounted(() => {
                         <div class="col-span-2">Log</div>
                     </div>
                     <div v-for="(set, setIndex) in exercise.sets" class="grid grid-cols-9 place-items-center">
-                        <Button icon="pi pi-ellipsis-v" text rounded class="col-span-1" :disabled="set.logged"
-                            @click="setMenuToggle($event, setIndex)" />
-                        <OverlayPanel ref="setMenu" appendTo="self">
-                            <Button text label="Remove set" @click="handleRemoveSet(exercise.id, set.id)"></Button>
-                        </OverlayPanel>
+                        <ConfirmPopup class="w-72"></ConfirmPopup>
+                        <Button @click="confirmRemoveSet($event, exercise.id, set.id)" icon="pi pi-times-circle" text
+                            rounded></Button>
                         <div class="col-span-3">
                             <input v-model="set.load" type="number" :disabled="set.logged"
                                 class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2">

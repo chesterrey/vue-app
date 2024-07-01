@@ -1,6 +1,5 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { useRouter } from 'vue-router';
 import useBlockStore from "../store/blocks.js";
 import useExerciseStore from "../store/exercises.js";
 import { useConfirm } from "primevue/useconfirm";
@@ -31,8 +30,6 @@ const exerciseMenu = ref();
 const exerciseMenuToggle = (event, exerciseId, index) => {
     exerciseMenu.value[index].toggle(event);
 };
-
-const setMenu = ref();
 
 const sessionDone = () => {
     return trainingSession.value.exercises.every((exercise) => isDone(exercise));
@@ -280,7 +277,6 @@ onMounted(() => {
                         <div class="col-span-2">Log</div>
                     </div>
                     <div v-for="(set, setIndex) in exercise.sets" class="grid grid-cols-9 place-items-center">
-                        <!-- <Button text label="X" @click="handleRemoveSet(exercise.id, set.id)"></Button> -->
                         <ConfirmPopup class="w-72"></ConfirmPopup>
                         <Button @click="confirmRemoveSet($event, exercise.id, set.id)" icon="pi pi-times-circle" text
                             rounded></Button>
