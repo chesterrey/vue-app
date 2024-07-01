@@ -1,6 +1,4 @@
-const API_URL = `https://api.strength-training.xyz/api/auth`;
-console.log(API_URL);
-console.log(`${import.meta.env.VITE_API_BASE_URL}/api`);
+const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api/auth`;
 
 class AuthService {
   async login(form) {
