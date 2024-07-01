@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000/api";
+const API_URL = "https://api.strength-training.xyz/api";
 
 class ExerciseService {
   async addExercise(form) {

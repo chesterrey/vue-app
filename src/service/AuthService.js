@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000";
+const API_URL = "https://api.strength-training.xyz";
 
 class AuthService {
   async login(form) {
