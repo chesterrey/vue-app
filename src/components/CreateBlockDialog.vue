@@ -64,7 +64,6 @@ const handleCreateTrainingBlock = () => {
 
     useBlockStore().addTrainingBlock(form).then((res) => {
         toast.add({ severity: 'success', summary: 'Success Message', detail: "Training Block added successfully", life: 3000 });
-        console.log(res);
     });
 }
 

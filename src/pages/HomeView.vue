@@ -150,11 +150,17 @@ onMounted(() => {
     }
 
     useBlockStore().getActiveTrainingBlock().then((response) => {
+
+        if (response.data.length === 0) {
+            return;
+        }
+
         trainingBlock.value = response.data;
         trainingSession.value = trainingBlock.value.training_days
             .find((d) => d.day === day.value).weeks
             .find((wk) => wk.week_number === week.value);
         goToNextSession(trainingSession.value);
+
     });
 });
 
@@ -276,6 +282,11 @@ onMounted(() => {
             </div>
             <div class="flex gap-4 justify-center w-full ">
                 <Button v-if="!trainingSession.done && sessionDone()" label="Session Done" @click="handleSessionDone" />
+            </div>
+        </div>
+        <div v-else>
+            <div class="flex flex-col items-center justify-center p-20">
+                <p>No active training block</p>
             </div>
         </div>
         <Dialog v-model:visible="editDialog" modal header="Exercise Form" :style="{ width: '20rem' }">

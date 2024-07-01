@@ -14,7 +14,7 @@ const route = router.currentRoute.value;
 const menu = ref();
 const items = ref([
     {
-        label: 'Profile',
+        label: `${useAuthStore().user.value}`,
         items: [
             {
                 label: 'Logout',

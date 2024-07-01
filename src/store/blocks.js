@@ -4,7 +4,7 @@ import BlockService from "../service/BlockService";
 const state = reactive({
   trainingCycles: [],
   trainingBlock: {},
-  activeTrainingBlock: {}
+  activeTrainingBlock: {},
 });
 
 export default function useBlockStore() {
@@ -51,8 +51,8 @@ export default function useBlockStore() {
     const response = await BlockService.addTrainingBlock(form);
     if (response.success) {
       state.trainingCycles = state.trainingCycles.map((cycle) => {
-        if (cycle.id === form.trainingCycleId) {
-          cycle.trainingBlocks.push(response.data);
+        if (cycle.id === form.training_cycle_id) {
+          cycle.training_blocks.push(response.data);
         }
         return cycle;
       });
