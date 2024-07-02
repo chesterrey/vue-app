@@ -16,12 +16,12 @@ export default defineConfig({
         theme_color: "#10B981",
         icons: [
           {
-            src: "/public/vite.svg",
+            src: "/vite.svg",
             sizes: "192x192",
             type: "image/svg+xml",
           },
           {
-            src: "/public/vite.svg",
+            src: "/vite.svg",
             sizes: "512x512",
             type: "image/svg+xml",
           },

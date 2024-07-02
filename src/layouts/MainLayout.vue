@@ -41,13 +41,13 @@ const toggle = (event) => {
         </header>
         <slot></slot>
         <nav class="fixed bottom-0 grid grid-cols-3 w-full min-h-20 border-t bg-white">
-            <router-link to="/home" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'home'}">
+            <router-link to="/home" class="p-4 pb-6 text-center" :class="{'bg-gray-200': route.name === 'home'}">
                 <i class="pi pi-flag"></i><br><span>Current</span>
             </router-link>
-            <router-link to="/blocks" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'blocks' || route.name === 'block-detail'}">
+            <router-link to="/blocks" class="p-4 pb-6 text-center" :class="{'bg-gray-200': route.name === 'blocks' || route.name === 'block-detail'}">
                 <i class="pi pi-folder-open"></i><br><span>Blocks</span>
             </router-link>
-            <router-link to="/progress" class="p-4 text-center" :class="{'bg-gray-200': route.name === 'progress'}">
+            <router-link to="/progress" class="p-4 pb-6 text-center" :class="{'bg-gray-200': route.name === 'progress'}">
                 <i class="pi pi-chart-line"></i><br><span>Progress</span>
             </router-link>
         </nav>
