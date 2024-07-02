@@ -244,7 +244,7 @@ onMounted(() => {
                     </OverlayPanel>
                 </div>
                 <Button outlined label="Set as active block" class="m-auto"
-                    v-if="trainingBlock.id !== activeTrainingBlock.id" @click="handleSetActiveBlock" />
+                    v-if="trainingBlock?.id !== activeTrainingBlock?.id" @click="handleSetActiveBlock" />
             </div>
             <div class="p-6 flex flex-col items-start border gap-2 shadow-md"
                 v-for="(exercise, index) in trainingSession.exercises">

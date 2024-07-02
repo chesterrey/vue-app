@@ -15,6 +15,8 @@ import Toast from 'primevue/toast';
 
 const router = useRouter();
 
+const loading = ref(false);
+
 const loginForm = ref({
     email: null,
     password: null
@@ -37,8 +39,10 @@ const showError = (message) => {
 };
 
 const handleRegister = () => {
+    loading.value = true;
     if (registerForm.value.password !== registerForm.value.password_confirmation) {
         showError();
+        loading.value = false;
         return;
     }
 
@@ -49,17 +53,20 @@ const handleRegister = () => {
                 router.push({ name: 'home' });
             }, 1000);
         } else {
+            loading.value = false;
             for (const key in res.data) {
                 showError(res.data[key][0]);
             }
         }
     }).catch((error) => {
         showError(error.response.data.message);
+        loading.value = false;
     });
 
 };
 
 const handleLogin = () => {
+    loading.value = true;
     useAuthStore().login(loginForm.value).then((res) => {
         if (res.success) {
             showSuccess(res.message);
@@ -68,9 +75,11 @@ const handleLogin = () => {
             }, 1000);
         } else {
             showError(res.message);
+            loading.value = false;
         }
     }).catch((error) => {
         showError(error.response);
+        loading.value = false;
     });
 };
 
@@ -92,7 +101,7 @@ const handleLogin = () => {
                             <label for="login-password">Password</label>
                             <Password id="login-password" v-model="loginForm.password" toggleMask :feedback="false" />
                         </div>
-                        <Button label="Login" @click="handleLogin" />
+                        <Button label="Login" @click="handleLogin" :loading="loading" />
                     </template>
                 </Card>
             </TabPanel>
@@ -118,7 +127,7 @@ const handleLogin = () => {
                             <Password id="register-confirm-password" v-model="registerForm.password_confirmation"
                                 toggleMask :feedback="false" />
                         </div>
-                        <Button label="Register" @click="handleRegister" />
+                        <Button label="Register" @click="handleRegister" :loading="loading" />
                     </template>
                 </Card>
             </TabPanel>

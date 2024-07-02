@@ -15,19 +15,23 @@ const { trainingCycles, getTrainingCycles } = useBlockStore();
 
 const router = useRouter();
 
+const loading = ref(true);
+
 const handleBlockClick = (e, id) => {
     e.stopPropagation();
     router.push({ name: 'block-detail', params: { id: id } });
 };
 
 onMounted(() => {
-    getTrainingCycles();
+    getTrainingCycles().then(() => {
+        loading.value = false;
+    });
 });
 
 </script>
 <template>
     <MainLayout>
-        <div class="min-h-[1200px]">
+        <div class="min-h-[1200px]" v-if="!loading">
             <div class="p-8 my-4 border-y flex justify-between items-center">
                 <h1 class="font-bold text-xl">Training Blocks</h1>
                 <CycleDialog />
@@ -45,12 +49,18 @@ onMounted(() => {
                         </div>
                     </template>
                     <p class="m-0 flex flex-col gap-2">
-                        <div v-for="block in cycle.training_blocks" class="p-8 bg-primary" @click="handleBlockClick($event, block.id)">
-                            <h2 class="font-bold text-lg text-center text-white">Block {{ block.order }}</h2>
-                        </div>
+                    <div v-for="block in cycle.training_blocks" class="p-8 bg-primary"
+                        @click="handleBlockClick($event, block.id)">
+                        <h2 class="font-bold text-lg text-center text-white">Block {{ block.order }}</h2>
+                    </div>
                     </p>
                 </AccordionTab>
             </Accordion>
+        </div>
+        <div v-else>
+            <div class="flex flex-col items-center justify-center p-20">
+                <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+            </div>
         </div>
     </MainLayout>
 </template>

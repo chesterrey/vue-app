@@ -15,6 +15,8 @@ import ConfirmPopup from 'primevue/confirmpopup';
 
 const confirm = useConfirm();
 
+const loading = ref(false);
+
 const trainingBlock = ref(null);
 const op = ref();
 const week = ref(1);
@@ -301,7 +303,7 @@ onMounted(() => {
         </div>
         <div v-else>
             <div class="flex flex-col items-center justify-center p-20">
-                <p>No active training block</p>
+                <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
             </div>
         </div>
         <Dialog v-model:visible="editDialog" modal header="Exercise Form" :style="{ width: '20rem' }">
