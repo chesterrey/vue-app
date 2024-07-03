@@ -111,15 +111,18 @@ const handleLogSet = (exerciseId, setId) => {
   );
   const set = exercise.sets.find((s) => s.id === setId);
 
-  if (set.logged && set.load && set.reps) {
-    useExerciseStore()
-      .updateExerciseSet(set)
-      .then(() => {
-        set.logged = true;
-      });
-  } else {
-    set.logged = false;
+  const setForm = {...set};
+
+  if (!set.logged) {
+    setForm.load = -1;
+    setForm.reps = -1;
   }
+
+  useExerciseStore()
+    .updateExerciseSet(setForm)
+    .then((res) => {
+      set.logged = res.data.logged;
+    });
 };
 
 const handleDeleteExercise = () => {
@@ -285,8 +288,10 @@ onMounted(() => {
                     class="w-10 h-8 text-lg font-semibold border-2 flex justify-center items-center"
                     :class="{
                       'text-white bg-primary border-primary': week.done,
-                      'text-primary border-primary': week.id === trainingSession.id && !week.done,
-                        'text-gray-500 border-gray-500': week.id !== trainingSession.id && !week.done
+                      'text-primary border-primary':
+                        week.id === trainingSession.id && !week.done,
+                      'text-gray-500 border-gray-500':
+                        week.id !== trainingSession.id && !week.done,
                     }"
                   >
                     D{{ trainingDay.day }}
