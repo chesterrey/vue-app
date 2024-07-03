@@ -25,6 +25,8 @@ const handleBlockClick = (e, id) => {
 onMounted(() => {
     getTrainingCycles().then(() => {
         loading.value = false;
+    }).catch(() => {
+        loading.value = false;
     });
 });
 
