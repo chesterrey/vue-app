@@ -6,6 +6,7 @@ import useBlockStore from '../store/blocks';
 
 import Avatar from 'primevue/avatar';
 import Menu from 'primevue/menu';
+import Button from 'primevue/button';
 
 const router = useRouter();
 
@@ -34,9 +35,9 @@ const toggle = (event) => {
 </script>
 <template>
     <main class="relative">
-        <header class="shadow-md py-4 px-8 flex justify-between items-center border-b">
+        <header class="shadow-md py-6 px-8 flex justify-between items-center border-b">
             <h1 class="text-lg font-bold">Training App</h1>
-            <Avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" @click="toggle" />
+            <Button icon="pi pi-user" rounded outlined @click="toggle" />
             <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
         </header>
         <slot></slot>

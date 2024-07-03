@@ -111,7 +111,7 @@ const handleLogSet = (exerciseId, setId) => {
   );
   const set = exercise.sets.find((s) => s.id === setId);
 
-  const setForm = {...set};
+  const setForm = { ...set };
 
   if (!set.logged) {
     setForm.load = -1;
@@ -261,7 +261,7 @@ onMounted(() => {
             </div>
           </div>
           <div class="flex items-center gap-4">
-            <Button icon="pi pi-calendar" outlined @click="toggleOverlay" />
+            <Button icon="pi pi-calendar" text @click="toggleOverlay" />
           </div>
           <OverlayPanel ref="op" appendTo="self">
             <div class="flex flex-col gap-6 w-[250px]">
@@ -436,6 +436,11 @@ onMounted(() => {
           label="Session Done"
           @click="handleSessionDone"
         />
+      </div>
+    </div>
+    <div v-else>
+      <div class="flex flex-col items-center justify-center p-20">
+        <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
       </div>
     </div>
     <Dialog
