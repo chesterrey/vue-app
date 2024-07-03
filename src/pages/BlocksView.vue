@@ -27,6 +27,8 @@ onMounted(() => {
         loading.value = false;
     }).catch(() => {
         loading.value = false;
+    }).finally(() => {
+        loading.value = false;
     });
 });
 
