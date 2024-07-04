@@ -27,12 +27,25 @@ const handleDialog = (e) => {
 };
 
 const handleSave = () => {
-    useBlockStore().addTrainingCycle(form.value);
-    form.value = {
-        name: ''
-    };
-    toast.add({ severity: 'success', summary: 'Success Message', detail: "Training Cycle added successfully", life: 3000 });
-    visible.value = false;
+    useBlockStore().addTrainingCycle(form.value).then((res) => {
+
+        const data = res.data;
+
+        if (res.success) {
+            toast.add({ severity: 'success', summary: 'Success Message', detail: "Training Cycle added successfully", life: 3000 });
+        } else {
+            data.name.forEach((item) => {
+                toast.add({ severity: 'error', summary: `${res.message}`, detail: item, life: 3000 });
+            });
+        }
+    }).catch((err) => {
+        toast.add({ severity: 'error', summary: 'Error Message', detail: "An error occurred while adding training cycle", life: 3000 });
+    }).finally(() => {
+        form.value = {
+            name: ''
+        };
+        visible.value = false;
+    });
 };
 
 const handleEdit = () => {

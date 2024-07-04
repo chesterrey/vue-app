@@ -16,6 +16,7 @@ import ConfirmPopup from "primevue/confirmpopup";
 
 const router = useRouter();
 const confirm = useConfirm();
+const loading = ref(true);
 
 const trainingBlock = ref(null);
 const op = ref();
@@ -213,12 +214,15 @@ onMounted(() => {
       activeTrainingBlock.value = response.data;
       if (router.currentRoute.value.name === "home") {
         if (response.data.length === 0) {
+          loading.value = false;
           return;
         }
         trainingBlock.value = response.data;
         trainingSession.value = trainingBlock.value.training_days
           .find((d) => d.day === day.value)
           .weeks.find((wk) => wk.week_number === week.value);
+
+        loading.value = false;
 
         goToNextSession(trainingSession.value);
       }
@@ -232,6 +236,8 @@ onMounted(() => {
         trainingSession.value = trainingBlock.value.training_days
           .find((d) => d.day === day.value)
           .weeks.find((wk) => wk.week_number === week.value);
+
+        loading.value = false;
 
         goToNextSession(trainingSession.value);
       });
@@ -438,9 +444,18 @@ onMounted(() => {
         />
       </div>
     </div>
-    <div v-else>
+    <div v-else-if="loading">
       <div class="flex flex-col items-center justify-center p-20">
         <i class="pi pi-spin pi-spinner" style="font-size: 2rem"></i>
+      </div>
+    </div>
+    <div
+      v-else-if="
+        !activeTrainingBlock && router.currentRoute.value.name === 'home' && !loading
+      "
+    >
+      <div class="flex flex-col items-center justify-center p-20">
+        Νο active training block found
       </div>
     </div>
     <Dialog
