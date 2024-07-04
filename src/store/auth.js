@@ -25,8 +25,8 @@ export default function useAuthStore() {
     const response = await AuthService.register(registerForm);
     if (response.success) {
       state.isAuthenticated = true;
-      state.user = response.data.user;
-      state.accessToken = response.data.accessToken;
+      state.user = response.data.name;
+      state.accessToken = response.data.token;
 
       localStorage.setItem("user", state.user);
       localStorage.setItem("accessToken", state.accessToken);
