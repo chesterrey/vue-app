@@ -68,6 +68,19 @@ export default function useBlockStore() {
     return response;
   };
 
+  const deleteTrainingBlock = async (id) => {
+    const response = await BlockService.deleteTrainingBlock(id);
+    if (response.success) {
+      state.trainingCycles = state.trainingCycles.map((cycle) => {
+        cycle.training_blocks = cycle.training_blocks.filter(
+          (block) => block.id !== id
+        );
+        return cycle;
+      });
+    }
+    return response;
+  };
+
   const updateTrainingWeek = async (form) => {
     const response = await BlockService.updateTrainingWeek(form);
     if (response.success) {
@@ -106,6 +119,7 @@ export default function useBlockStore() {
     editTrainingCycle,
     addTrainingBlock,
     getTrainingBlock,
+    deleteTrainingBlock,
     updateTrainingWeek,
     getActiveTrainingBlock,
     setActiveTrainingBlock,

@@ -158,6 +158,28 @@ class BlockService {
     }
   }
 
+  async deleteTrainingBlock(id) {
+    try {
+      const response = await fetch(`${API_URL}/training-blocks/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }).then((response) => {
+        return response.json();
+      });
+      return response;
+    } catch (e) {
+      return {
+        message: e.response.data.message,
+        code: e.response.status,
+        success: false,
+        data: null,
+      };
+    }
+  }
+
   async updateTrainingWeek(form) {
     try {
       const response = await fetch(`${API_URL}/weeks/${form.id}`, {
