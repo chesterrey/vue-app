@@ -20,6 +20,7 @@ const props = defineProps({
 });
 
 const toast = useToast();
+const loading =ref(false);
 
 const visible = ref(false);
 const weeks = ref(4);
@@ -56,6 +57,9 @@ const removeExercise = (e) => {
 }
 
 const handleCreateTrainingBlock = () => {
+
+    loading.value = true;
+
     const form = {
         training_cycle_id: props.trainingCycle.id,
         weeks: weeks.value,
@@ -64,7 +68,11 @@ const handleCreateTrainingBlock = () => {
 
     useBlockStore().addTrainingBlock(form).then((res) => {
         toast.add({ severity: 'success', summary: 'Success Message', detail: "Training Block added successfully", life: 3000 });
-    });
+    }).catch(() => {
+        return
+    }).finally(() => {
+        loading.value = false;
+    })
 }
 
 
@@ -136,7 +144,7 @@ onMounted(() => {
             <StepperPanel>
                 <template #content="{ prevCallback }">
                     <div class="flex flex-col">
-                        <Button @click="handleCreateTrainingBlock" label="Create training block"></Button>
+                        <Button @click="handleCreateTrainingBlock" label="Create training block" :loading="loading"></Button>
                     </div>
                     <div class="flex pt-4 justify-start">
                         <Button label="Back" severity="secondary" icon="pi pi-arrow-left" @click="prevCallback" />

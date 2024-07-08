@@ -1,6 +1,25 @@
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/api`;
 
 class ExerciseService {
+  async getExercises() {
+    try {
+      const response = await fetch(`${API_URL}/exercises`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+        },
+      }).then((response) => {
+        return response.json();
+      });
+      return response;
+    } catch (e) {
+      return {
+        message: e.response.data.message,
+        code: e.response.status,
+        success: false,
+        data: null,
+      };
+    }
+  }
   async addExercise(form) {
     console.log(form);
     try {
