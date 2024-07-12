@@ -108,9 +108,9 @@ onMounted(() => {
 <template>
     <Toast />
     <div class="card flex justify-center">
-        <Button icon="pi pi-pencil" outlined severity="warning" v-if="method === 'edit'" @click="handleDialog" />
-        <Button icon="pi pi-trash" outlined severity="danger" v-if="method === 'delete'" @click="handleDialog" />
-        <Button label="New" v-if="!method" @click="handleDialog" />
+        <Button icon="pi pi-pencil" rounded severity="plain" v-if="method === 'edit'" @click="handleDialog" />
+        <Button icon="pi pi-trash" rounded severity="plain" v-if="method === 'delete'" @click="handleDialog" />
+        <Button icon="pi pi-plus" rounded v-if="!method" @click="handleDialog" />
         <Dialog v-model:visible="visible" modal header="New Training Cycle" :style="{ width: '25rem' }" v-if="!method">
             <div class="my-4">
                 <label for="name" class="font-semibold">Training Cycle Name</label>
@@ -126,18 +126,6 @@ onMounted(() => {
             <div class="my-4">
                 <label for="name" class="font-semibold">Training Cycle Name</label>
                 <InputText id="name" class="mt-2 w-full" autocomplete="off" v-model="form.name" />
-            </div>
-            <div class="flex flex-col py-4">
-                <div class="flex" v-for="block in trainingCycle.training_blocks">
-                    <ConfirmPopup class="w-72"></ConfirmPopup>
-                    <Button
-                    @click="confirmDeleteBlock($event, block.id)"
-                    icon="pi pi-times-circle"
-                    text
-                    rounded
-                    ></Button>
-                    <div class="place-self-center font-semibold text-lg">Block {{ block.order }}</div>
-                </div>
             </div>
             <div class="flex justify-end gap-2">
                 <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>

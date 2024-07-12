@@ -72,6 +72,7 @@ const handleCreateTrainingBlock = () => {
         return
     }).finally(() => {
         loading.value = false;
+        visible.value = false;
     })
 }
 
@@ -88,7 +89,7 @@ onMounted(() => {
 </script>
 <template>
     <Toast />
-    <Button icon="pi pi-plus" outlined @click="handleDialog" />
+    <Button icon="pi pi-plus" text @click="handleDialog" />
     <Dialog v-model:visible="visible" modal header="Add Training Block" :style="{ width: '25rem' }">
         <Stepper linear>
             <StepperPanel>
