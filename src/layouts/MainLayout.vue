@@ -36,9 +36,9 @@ const toggle = (event) => {
 <template>
   <main class="relative">
     <header
-      class="shadow-md py-6 px-8 flex justify-between items-center border-b"
+      class="shadow-md py-6 px-6 flex justify-between items-center border-b"
     >
-      <h1 class="text-lg font-bold">Training App</h1>
+      <h1 class="text-xl font-bold text-primary">Strength Training</h1>
       <Button icon="pi pi-user" rounded outlined @click="toggle" />
       <Menu ref="menu" id="overlay_menu" :model="items" :popup="true" />
     </header>
