@@ -21,7 +21,6 @@ class ExerciseService {
     }
   }
   async addExercise(form) {
-    console.log(form);
     try {
       const response = await fetch(`${API_URL}/exercises`, {
         method: "POST",
@@ -67,7 +66,6 @@ class ExerciseService {
   }
 
   async deleteExercise(id) {
-    console.log(id);
     try {
       const response = await fetch(`${API_URL}/exercises/${id}`, {
         method: "DELETE",

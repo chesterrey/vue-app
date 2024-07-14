@@ -5,6 +5,7 @@ import useBlockStore from "../store/blocks.js";
 import useExerciseStore from "../store/exercises.js";
 import { useConfirm } from "primevue/useconfirm";
 import MainLayout from "../layouts/MainLayout.vue";
+import { useToast } from "primevue/usetoast";
 
 import Button from "primevue/button";
 import OverlayPanel from "primevue/overlaypanel";
@@ -13,9 +14,11 @@ import Chip from "primevue/chip";
 import Dialog from "primevue/dialog";
 import InputText from "primevue/inputtext";
 import ConfirmPopup from "primevue/confirmpopup";
+import Toast from "primevue/toast";
 
 const router = useRouter();
 const confirm = useConfirm();
+const toast = useToast();
 const loading = ref(true);
 
 const trainingBlock = ref(null);
@@ -34,11 +37,6 @@ const activeTrainingBlock = ref(null);
 const exerciseMenu = ref();
 const exerciseMenuToggle = (event, exerciseId, index) => {
   exerciseMenu.value[index].toggle(event);
-};
-
-const setMenu = ref();
-const setMenuToggle = (event, index) => {
-  setMenu.value[index].toggle(event);
 };
 
 const sessionDone = () => {
@@ -127,6 +125,10 @@ const handleLogSet = (exerciseId, setId) => {
 };
 
 const handleDeleteExercise = () => {
+  if (trainingSession.value.exercises.length === 1) {
+    deleteDialog.value = false;
+    return;
+  }
   useExerciseStore()
     .deleteExercise(selectedExercise.value.id)
     .then(() => {
@@ -144,6 +146,16 @@ const handleSessionDone = () => {
     .updateTrainingWeek(trainingSession.value)
     .then((res) => {
       trainingSession.value = res.data;
+      toast.add({
+        severity: "success",
+        summary: "Session Done",
+        detail: "Session has been marked as done",
+        life: 3000,
+      })
+
+      setTimeout(() => {
+        location.reload();
+      }, 1000);
     });
 };
 
@@ -245,6 +257,7 @@ onMounted(() => {
 });
 </script>
 <template>
+  <Toast />
   <MainLayout>
     <div class="min-h-[1200px] pb-96 flex flex-col gap-4" v-if="trainingBlock">
       <div class="p-6 flex flex-col border shadow-md gap-4">
@@ -314,6 +327,14 @@ onMounted(() => {
           v-if="trainingBlock?.id !== activeTrainingBlock?.id"
           @click="handleSetActiveBlock"
         />
+      </div>
+      <div
+        v-if="trainingSession.exercises.length <= 0 && !loading"
+        class="p-6 bg-surface-100"
+      >
+        <div class="flex justify-center items-center w-full">
+          <h3 class="font-semibold text-lg">Complete previous session to view this session's workout</h3>
+        </div>
       </div>
       <div
         class="p-6 flex flex-col items-start border gap-2 shadow-md"
@@ -438,7 +459,11 @@ onMounted(() => {
       </div>
       <div class="flex gap-4 justify-center w-full">
         <Button
-          v-if="!trainingSession.done && sessionDone()"
+          v-if="
+            !trainingSession.done &&
+            sessionDone() &&
+            trainingSession.exercises.length > 0
+          "
           label="Session Done"
           @click="handleSessionDone"
         />
@@ -451,7 +476,9 @@ onMounted(() => {
     </div>
     <div
       v-else-if="
-        !activeTrainingBlock && router.currentRoute.value.name === 'home' && !loading
+        !activeTrainingBlock &&
+        router.currentRoute.value.name === 'home' &&
+        !loading
       "
     >
       <div class="flex flex-col items-center justify-center p-20">
