@@ -101,6 +101,25 @@ const handleRemoveSet = (exerciseId, setId, index) => {
     .deleteExerciseSet(setId)
     .then(() => {
       exercise.sets.splice(setIndex, 1);
+      const prevSession = trainingBlock.value.training_days
+        .find((d) => d.day === trainingSession.value.day)
+        .weeks.find(
+          (wk) => wk.week_number === trainingSession.value.week_number - 1
+        );
+      prevSession.exercises.forEach((exercise) => {
+        const currentSessionExercise = trainingSession.value.exercises.find(
+          (e) => exercise.name === e.name
+        );
+
+        try {
+          exercise.sets.forEach((set, index) => {
+            currentSessionExercise.sets[index].prevLoad = set.load;
+            currentSessionExercise.sets[index].prevReps = set.reps;
+          });
+        } catch (error) {
+          return;
+        }
+      });
     });
 };
 
@@ -151,7 +170,7 @@ const handleSessionDone = () => {
         summary: "Session Done",
         detail: "Session has been marked as done",
         life: 3000,
-      })
+      });
 
       setTimeout(() => {
         location.reload();
@@ -193,6 +212,30 @@ watch([week, day], () => {
   trainingSession.value = trainingBlock.value.training_days
     .find((d) => d.day === day.value)
     .weeks.find((wk) => wk.week_number === week.value);
+});
+
+watch(trainingSession, () => {
+  if (!trainingSession.value.done) {
+    const prevSession = trainingBlock.value.training_days
+      .find((d) => d.day === trainingSession.value.day)
+      .weeks.find(
+        (wk) => wk.week_number === trainingSession.value.week_number - 1
+      );
+    prevSession.exercises.forEach((exercise) => {
+      const currentSessionExercise = trainingSession.value.exercises.find(
+        (e) => exercise.name === e.name
+      );
+
+      try {
+        exercise.sets.forEach((set, index) => {
+          currentSessionExercise.sets[index].prevLoad = set.load;
+          currentSessionExercise.sets[index].prevReps = set.reps;
+        });
+      } catch (error) {
+        return;
+      }
+    });
+  }
 });
 
 onMounted(() => {
@@ -333,7 +376,9 @@ onMounted(() => {
         class="p-6 bg-surface-100"
       >
         <div class="flex justify-center items-center w-full">
-          <h3 class="font-semibold text-lg">Complete previous session to view this session's workout</h3>
+          <h3 class="font-semibold text-lg">
+            Complete previous session to view this session's workout
+          </h3>
         </div>
       </div>
       <div
@@ -435,6 +480,7 @@ onMounted(() => {
                 v-model="set.load"
                 type="number"
                 :disabled="set.logged"
+                :placeholder="set.prevLoad"
                 class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2"
               />
             </div>
@@ -442,6 +488,7 @@ onMounted(() => {
               <input
                 v-model="set.reps"
                 type="number"
+                :placeholder="set.prevReps"
                 :disabled="set.logged"
                 class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2"
               />
