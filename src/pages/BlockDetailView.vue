@@ -208,6 +208,14 @@ const confirmRemoveSet = (event, exerciseId, setId) => {
   });
 };
 
+const handleDeloadCheckbox = () => {
+  useBlockStore()
+    .updateTrainingWeek(trainingSession.value)
+    .then((res) => {
+      trainingSession.value.deload = res.data.deload;
+    });
+};
+
 watch([week, day], () => {
   trainingSession.value = trainingBlock.value.training_days
     .find((d) => d.day === day.value)
@@ -363,6 +371,16 @@ onMounted(() => {
             </div>
           </OverlayPanel>
         </div>
+        <!-- NOTE: NOT INCLUDED IN v0.0.1 -->
+        <!-- <div v-if="trainingSession.week_number === trainingBlock.weeks" class="flex items-center">
+          <Checkbox
+            v-model="trainingSession.deload"
+            name="deload"
+            :binary="true"
+            @change="handleDeloadCheckbox"
+          />
+          <label for="ingredient1" class="ml-2"> Deload? </label>
+        </div> -->
         <Button
           outlined
           label="Set as active block"
