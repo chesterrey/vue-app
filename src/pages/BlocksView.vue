@@ -111,7 +111,7 @@ onMounted(() => {
             </div>
           </template>
           <div class="m-0 flex flex-col gap-2">
-            <div v-if="!selectedBlock" class="flex justify-between items-center gap-2 border border-surface-300 shadow-sm p-1 rounded-xl mb-4">
+            <div v-if="!selectedBlock" class="flex justify-around items-center gap-2 border border-surface-300 shadow-sm p-1 rounded-xl mb-4">
               <CreateBlockDialog :trainingCycle="cycle" />
               <CycleDialog :trainingCycle="cycle" method="edit" />
               <CycleDialog :trainingCycle="cycle" method="delete" />
