@@ -16,6 +16,8 @@ import InputText from "primevue/inputtext";
 import ConfirmPopup from "primevue/confirmpopup";
 import Toast from "primevue/toast";
 
+import SessionLogCheckbox from "../components/block-detail/SessionLogCheckbox.vue";
+
 const router = useRouter();
 const confirm = useConfirm();
 const toast = useToast();
@@ -511,14 +513,16 @@ onMounted(() => {
                 class="w-[75px] text-center focus:outline-primary p-2 rounded-none border-2"
               />
             </div>
-            <div class="col-span-2">
+            <!-- <div class="col-span-2">
+              <i class="pi pi-spin pi-spinner"></i>
               <Checkbox
                 v-model="set.logged"
                 :binary="true"
                 @change="handleLogSet(exercise.id, set.id)"
                 :disabled="!set.load || !set.reps || trainingSession.done"
               />
-            </div>
+            </div> -->
+            <SessionLogCheckbox :trainingSession="trainingSession" :exerciseId="exercise.id" :set="set" />
           </div>
         </div>
       </div>
