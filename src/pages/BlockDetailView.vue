@@ -103,6 +103,11 @@ const handleRemoveSet = (exerciseId, setId, index) => {
     .deleteExerciseSet(setId)
     .then(() => {
       exercise.sets.splice(setIndex, 1);
+
+      if (week.value === 1) {
+        return;
+      }
+
       const prevSession = trainingBlock.value.training_days
         .find((d) => d.day === trainingSession.value.day)
         .weeks.find(
@@ -226,6 +231,11 @@ watch([week, day], () => {
 
 watch(trainingSession, () => {
   if (!trainingSession.value.done) {
+
+    if (week.value === 1) {
+      return;
+    }
+
     const prevSession = trainingBlock.value.training_days
       .find((d) => d.day === trainingSession.value.day)
       .weeks.find(
@@ -250,6 +260,13 @@ watch(trainingSession, () => {
 
 onMounted(() => {
   const goToNextSession = (session) => {
+    // if (!session) {
+    //   console.log(trainingBlock.value);
+    //   console.log(week.value);
+    //   console.log(day.value);
+    //   return;
+    // }
+
     if (!session.done) {
       week.value = session.week_number;
       day.value = session.day;
@@ -266,11 +283,15 @@ onMounted(() => {
       nextDay++;
     }
 
-    trainingSession.value = trainingBlock.value.training_days
+    var nextTrainingSession = trainingBlock.value.training_days
       .find((d) => d.day === nextDay)
       .weeks.find((wk) => wk.week_number === nextWeek);
 
-    goToNextSession(trainingSession.value);
+    if (nextTrainingSession) {
+      trainingSession.value = nextTrainingSession;
+      goToNextSession(trainingSession.value);
+    }
+
   };
 
   useBlockStore()
@@ -522,7 +543,11 @@ onMounted(() => {
                 :disabled="!set.load || !set.reps || trainingSession.done"
               />
             </div> -->
-            <SessionLogCheckbox :trainingSession="trainingSession" :exerciseId="exercise.id" :set="set" />
+            <SessionLogCheckbox
+              :trainingSession="trainingSession"
+              :exerciseId="exercise.id"
+              :set="set"
+            />
           </div>
         </div>
       </div>
